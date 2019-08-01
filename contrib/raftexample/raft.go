@@ -53,8 +53,8 @@ type raftNode struct {
 	lastIndex   uint64 // index of log at start
 
 	confState     raftpb.ConfState
-	snapshotIndex uint64
-	appliedIndex  uint64
+	snapshotIndex uint64 // 最后一次建快照的 Index
+	appliedIndex  uint64 // 已经应用的 Index
 
 	// raft backing for the commit/error channel
 	node        raft.Node
@@ -436,6 +436,9 @@ func (rc *raftNode) serveChannels() {
 			}
 			rc.raftStorage.Append(rd.Entries)
 			rc.transport.Send(rd.Messages)
+			if len(rd.CommittedEntries) > 0 {
+				log.Println("len", len(rd.CommittedEntries), rd.CommittedEntries)
+			}
 			if ok := rc.publishEntries(rc.entriesToApply(rd.CommittedEntries)); !ok {
 				rc.stop()
 				return
