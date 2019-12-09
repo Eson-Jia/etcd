@@ -16,7 +16,7 @@
 
 ## 操作 etcd
 
-1. `etcdctl`命令行界面
+1. `etcdctl`命令行界面,`etcdctl`支持读取环境变量作为参数.
 
 ### K-V 操作
 
@@ -48,4 +48,18 @@ put key2 "some extra key"
 
 #### compaction 日志压缩
 
-因为 con
+因为 etcd 的日志都有版本(logIndex)，可以回到之前的版本(Index)，但是这样的代价就是牺牲了存储空间.当之前这些版本不再需要的时候,需要这些版本的最后的状态拍摄成快照并将这些版本删除.
+
+`etcdctl compaction reversion`
+
+#### watch 监测键值的修改
+
+WATCH [options] [key or prefix] [range_end] [--] [exec-command arg1 arg2 ...]
+
+当`watch`的键值有修改时会执行后面的命令,这个命令会持续运行直到出现错误或者被取消.像`get`命令一样,被`watch`的可以是一个键,一个键的范围,或者是所有包含指定前缀的键.
+命令为:
+
+- `watch`并打印修改内容:`etcdctl watch the_watched_key`
+- `watch`并执行相应的命令:`etcdctl watch the_watched_key -- echo "the_watched_key is changed"`
+
+#### 租期
