@@ -91,8 +91,12 @@ $etcdctl get --from-keys ""
 test_lease
 test_lease1
 test_lease2
+$etcdctl lease keep-alive 32696eed79ac2a0a # 对租期进行保活操作,每次刷新租期的到期时间以保证租期一直存在
+lease 32696eed79ac2a0a keepalived with TTL(1000)
+...
+lease 32696eed79ac2a0a keepalived with TTL(1000)
 $etcdctl lease revoke 32696eed79ac2a0a # 删除租期,挂在在该租期的所有键值都会被删除
 lease 32696eed79ac2a0a revoked
-$etcdctl get ''  --from-keys
+$etcdctl get ''  --from-keys # 删除完租期之后,挂载在该租期上的所有键都会被删除
 ```
 
