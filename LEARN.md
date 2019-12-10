@@ -62,4 +62,37 @@ WATCH [options] [key or prefix] [range_end] [--] [exec-command arg1 arg2 ...]
 - `watch`并打印修改内容:`etcdctl watch the_watched_key`
 - `watch`并执行相应的命令:`etcdctl watch the_watched_key -- echo "the_watched_key is changed"`
 
-#### 租期
+#### lease 租期
+
+COMMANDS:
+
+| 子命令     | 描述                       | 描述                                |
+|------------|----------------------------|-------------------------------------|
+| grant      | Creates leases             | 创建租期并返回一个租期的 ID         |
+| keep-alive | Keeps leases alive (renew) | 对指定租期 ID 进行包活              |
+| list       | List all active leases     | 获取所有有效的 lease                |
+| revoke     | Revokes leases             | 删除租期,与之相关联的键都会被删除掉 |
+| timetolive | Get lease information      | 根据 ID 获取指定 lease 的信息       |
+
+```bash
+$etcdctl lease grant 1000 # 申请一个租期
+lease 32696eed79ac2a0a granted with TTL(1000s) # 申请成功,得到一个租期 ID
+$etcdctl lease timetolive 32696eed79ac2a0a # 查看租期的信息
+lease 32696eed79ac2a0a granted with TTL(1000s), remaining(974s)
+$etcdctl put test_lease some_value --lease 32696eed79ac2a0a # put 一个键 并挂载上面申请的租期
+OK
+$etcdctl put test_lease1 some_value --lease 32696eed79ac2a0a # put 第二个键 并挂载上面申请的同一个租期
+OK
+$etcdctl put test_lease2 some_value --lease 32696eed79ac2a0a # put 第三个键 并挂载上面申请的同一个租期
+OK
+$etcdctl lease timetolive --keys  32696eed79ac2a0a # 获取租期的信息并使用`--keys`指定获取挂载该租期的所有键
+lease 32696eed79ac2a0a granted with TTL(1000s), remaining(885s), attached keys([test_lease test_lease1 test_lease2])
+$etcdctl get --from-keys ""
+test_lease
+test_lease1
+test_lease2
+$etcdctl lease revoke 32696eed79ac2a0a # 删除租期,挂在在该租期的所有键值都会被删除
+lease 32696eed79ac2a0a revoked
+$etcdctl get ''  --from-keys
+```
+
