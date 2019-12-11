@@ -21,6 +21,8 @@ import (
 	"go.etcd.io/etcd/v3/raft/raftpb"
 )
 
+// 流程:当 http server 收到一个 put 的 proposal 的时候,通过`propose channel`传给`raft consensus`,后者会转发到集群中的其他节点.
+// 当集群中节点达成共识的时候.会产生一个`commit`,`consensus`通过`commit channel`发送给 kv-store.
 func main() {
 	cluster := flag.String("cluster", "http://127.0.0.1:9021", "comma separated cluster peers")
 	id := flag.Int("id", 1, "node ID")
