@@ -15,11 +15,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"testing"
+	"time"
 )
 
 func TestMain(t *testing.T) {
@@ -36,4 +38,21 @@ func TestMain(t *testing.T) {
 	signal.Notify(notifier, syscall.SIGINT, syscall.SIGTERM)
 	go main()
 	<-notifier
+}
+
+func TestGo(t *testing.T) {
+	a := 0
+	func() {
+		go func() {
+			for {
+				a++
+				time.Sleep(time.Millisecond * 100)
+			}
+		}()
+
+	}()
+	tick := time.Tick(time.Second)
+	for range tick {
+		fmt.Println(a)
+	}
 }
