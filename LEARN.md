@@ -20,6 +20,19 @@
 
 ### K-V 操作
 
+```bash
+     --consistency="l"
+      --from-key[=false]  #获取大于等于指定`key`的所有键
+  -h, --help[=false]
+      --keys-only[=false] #只显示 key
+      --limit=0
+      --order=""          #生序降序
+      --prefix[=false]    #获取拥有指定前缀`key`的所有键
+      --print-value-only[=false]
+      --rev=0             # 获取之前版本的值
+      --sort-by=""
+```
+
 #### put key
 
 - etcdctl put key value
@@ -100,3 +113,33 @@ lease 32696eed79ac2a0a revoked
 $etcdctl get ''  --from-keys # 删除完租期之后,挂载在该租期上的所有键都会被删除
 ```
 
+### 并发相关操作
+
+#### Distributed locks 分布式锁
+
+`etcdctl lock <lockname> [exec-command arg1 arg2 ...] [flags]`
+
+```bash
+# 获取锁后,会一直阻塞着终端,直到`Ctrl+C`退出才会释放锁
+$etcdctl lock the_mutex
+# 另一个终端运行同样的命令会一直阻塞等待获取锁,直到前一个终端释放锁
+$etcdctl lock the_mutex
+```
+
+lock 支持在获取锁之后执行后面的扩展命令,当命令执行完之后才会释放锁,使用场景:
+
+- 可以在多线程秒杀中使用:
+  - 例如,多个线程秒杀 `ID:1`的商品
+  - 只有抢到分布式锁的线程可以将数据库中的商品库存减一
+  - 操作完数据库之后**才会**释放分布式锁,让其他线程继续操作
+
+```bash
+# 多个进程或者线程都进行商品秒杀
+$etcdctl lock commodity:1 echo '读取库存,将库存减一,更新库存'
+...
+$etcdctl lock commodity:1 echo '读取库存,将库存减一,更新库存'
+```
+
+### Cluster 相关操作
+
+todo
