@@ -61,9 +61,8 @@ func (opts *jwtOptions) ParseWithDefaults(optMap map[string]string) error {
 
 // Parse will load options from the specified map
 func (opts *jwtOptions) Parse(optMap map[string]string) error {
-	var err error
 	if ttl := optMap[optTTL]; ttl != "" {
-		opts.TTL, err = time.ParseDuration(ttl)
+		opts.TTL, err := time.ParseDuration(ttl)
 		if err != nil {
 			return err
 		}

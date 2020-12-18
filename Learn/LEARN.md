@@ -2,6 +2,7 @@
 
 ## 文档引用
 
+- [名词表](https://github.com/etcd-io/etcd/blob/master/Documentation/learning/glossary.md)
 - [master.Document](https://github.com/etcd-io/etcd/tree/master/Documentation)
 - [mater.Document.Developing with etcd](https://github.com/etcd-io/etcd/tree/master/Documentation#developing-with-etcd)
 
@@ -114,6 +115,8 @@ $etcdctl get ''  --from-keys # 删除完租期之后,挂载在该租期上的所
 ```
 
 ### 并发相关操作
+
+[分布式锁的示例](https://godoc.org/go.etcd.io/etcd/clientv3/concurrency#example-Mutex-Lock)
 
 #### Distributed locks 分布式锁
 
